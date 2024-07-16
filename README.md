@@ -6,6 +6,10 @@ Due to capacity issues, train and test data is available for download from the f
 
 Replace the 'data' dir within the GitHub folder with the downloaded 'data' dir to utilize the provided code for train and test.
 
+
+![KakaoTalk_20240716_222027048](https://github.com/user-attachments/assets/de856633-5bbf-44aa-bb62-edeebacfae0b)
+
+
 ## Requirements
 
 python==3.7 \
