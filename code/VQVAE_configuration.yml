@@ -1,0 +1,54 @@
+Path:
+    dataset_path: "../data/pre-training/compound/MgraphDatanonH.pt"
+    save_path: "../checkpoints/pre-training/compound/"
+
+Train:
+    device: 0
+    batch_size: 512
+    epochs: 300
+    lr: 0.00008
+    decay: 0.0
+    dropout_ratio: 0.2
+    seed: 0
+    num_workers: 8
+    patience: 20
+
+Architecture:
+    num_layer: 5
+    emb_dim: 256
+    num_tokens: 512
+    commitment_cost: 2.0
+    edge: 1
+    JK: "last"
+    gnn_type: "gin"
+
+MGraphModel:
+    architecture: {"target_dim": 256,
+                   "hidden_dim": 256,
+                   "mid_batch_norm": True,
+                   "last_batch_norm": True,
+                   "readout_batchnorm": True,
+                   "batch_norm_momentum": 0.93,
+                   "readout_hidden_dim": 256,
+                   "readout_layers": 2,
+                   "dropout": 0.0,
+                   "propagation_depth": 3,
+                   "aggregators": ['mean', 'max', 'min', 'std'],
+                   "scalers": ['identity', 'amplification', 'attenuation'],
+                   "readout_aggregators": ['min', 'max', 'mean'],
+                   "pretrans_layers": 2,
+                   "posttrans_layers": 1,
+                   "residual": True
+                }
+                
+Scheduler:
+    params: {"warmup_steps": [700], 
+            "wrapped_scheduler": 'ReduceLROnPlateau',
+            "cooldown": 20,
+            "factor": 0.6,
+            "patience": 25,
+            "min_lr": 1e-06,
+            "threshold": 0.0001,
+            "mode": 'min',
+            "verbose": True
+        }

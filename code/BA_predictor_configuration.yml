@@ -1,0 +1,79 @@
+Path:
+    Kfold: "../data/affinity/kfold_index.pkl"
+    training_data: "../data/affinity/training_data.tsv"
+    training_protein_feat: "../data/affinity/training_protein_features.pkl"
+    training_ligand_graph: "../data/affinity/graph_data.pt"
+    training_interaction: "../data/affinity/train_max_nonh_interaction.pkl"
+    training_pocket_ind: "../results/pre-training/protein/CV1/BA_Training_pocket.pkl"
+    pretrained_interaction_predictor: "../checkpoints/pre-training/interaction/CV1/InteractionSite_predictor.pth"
+    save_path: "../checkpoints/affinity/"
+    CASF2016_data: "../data/affinity/CASF2016_data.tsv"
+    CASF2016_protein_feat: "../data/affinity/CASF2016_protein_features.pkl"
+    CASF2016_interaction: "../data/affinity/CASF2016_indivisual_nonh_interaction.pkl"
+    CASF2016_pocket_ind: "../results/pre-training/protein/CV1/CASF2016_pocket.pkl"
+    CASF2013_data: "../data/affinity/CASF2013_data.tsv"
+    CASF2013_protein_feat: "../data/affinity/CASF2013_protein_features.pkl"
+    CASF2013_interaction: "../data/affinity/CASF2013_indivisual_nonh_interaction.pkl"
+    CASF2013_pocket_ind: "../results/pre-training/protein/CV1/CASF2013_pocket.pkl"
+    CSAR2014_data: "../data/affinity/CSAR2014_data.tsv"
+    CSAR2014_protein_feat: "../data/affinity/CSAR2014_protein_features.pkl"
+    CSAR2014_interaction: "../data/affinity/CSAR2014_indivisual_nonh_interaction.pkl"
+    CSAR2014_pocket_ind: "../results/pre-training/protein/CV1/CSAR2014_pocket.pkl"
+    CSAR2012_data: "../data/affinity/CSAR2012_data.tsv"
+    CSAR2012_protein_feat: "../data/affinity/CSAR2012_protein_features.pkl"
+    CSAR2012_interaction: "../data/affinity/CSAR2012_indivisual_nonh_interaction.pkl"
+    CSAR2012_pocket_ind: "../results/pre-training/protein/CV1/CSAR2012_pocket.pkl"
+    CSARset1_data: "../data/affinity/CSARset1_data.tsv"
+    CSARset1_protein_feat: "../data/affinity/CSARset1_protein_features.pkl"
+    CSARset1_interaction: "../data/affinity/CSARset1_indivisual_nonh_interaction.pkl"
+    CSARset1_pocket_ind: "../results/pre-training/protein/CV1/CSARset1_pocket.pkl"
+    CSARset2_data: "../data/affinity/CSARset2_data.tsv"
+    CSARset2_protein_feat: "../data/affinity/CSARset2_protein_features.pkl"
+    CSARset2_interaction: "../data/affinity/CSARset2_indivisual_nonh_interaction.pkl"
+    CSARset2_pocket_ind: "../results/pre-training/protein/CV1/CSARset2_pocket.pkl"
+    Astex_data: "../data/affinity/Astex_data.tsv"
+    Astex_protein_feat: "../data/affinity/Astex_protein_features.pkl"
+    Astex_interaction: "../data/affinity/Astex_indivisual_nonh_interaction.pkl"
+    Astex_pocket_ind: "../results/pre-training/protein/CV1/Astex_pocket.pkl"
+    test_results_path: "../results/affinity/"
+    
+Train:
+    device: 0
+    seed: 0
+    batch_size: 32
+    epochs: 200
+    lr: 0.001
+    decay: 0.0
+    patience: 45
+
+MGraphModel:
+    Architecture: {"target_dim": 256,
+                   "hidden_dim": 256,
+                   "mid_batch_norm": True,
+                   "last_batch_norm": True,
+                   "readout_batchnorm": True,
+                   "batch_norm_momentum": 0.93,
+                   "readout_hidden_dim": 256,
+                   "readout_layers": 2,
+                   "dropout": 0.0,
+                   "propagation_depth": 3,
+                   "aggregators": ['mean', 'max', 'min', 'std'],
+                   "scalers": ['identity', 'amplification', 'attenuation'],
+                   "readout_aggregators": ['min', 'max', 'mean'],
+                   "pretrans_layers": 2,
+                   "posttrans_layers": 1,
+                   "residual": True}
+                
+CrossAttention:
+    Architecture: {"num_layer": 2,
+                   "hidden_size": 256, 
+                   "intermediate_size": 512,
+                   "num_attention_heads": 4, 
+                   "hidden_act": gelu}
+    Train: {dropout: 0.1}     
+
+InteractionSite:
+    Architecture: {"hidden_size": 256, 
+                   "intermediate_size": 512,
+                   "num_attention_heads": 4, 
+                   "dropout": 0.1}

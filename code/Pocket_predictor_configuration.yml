@@ -1,0 +1,42 @@
+Path:
+    training_data: "../data/pre-training/protein/pocket_predictor_training_data.tsv"
+    prot_feats: "../data/pre-training/protein/pocket_predictor_training_features.pkl"
+    save_path: "../checkpoints/pre-training/protein/"
+    BA_training_data: "../data/pre-training/protein/BS_training_labels.tsv"
+    BA_training_prot_feats: "../data/affinity/training_protein_features.pkl"
+    CASF2016_data: "../data/pre-training/protein/BS_CASF2016_labels.tsv"
+    CASF2016_prot_feats: "../data/affinity/CASF2016_protein_features.pkl"
+    CASF2013_data: "../data/pre-training/protein/BS_CASF2013_labels.tsv"
+    CASF2013_prot_feats: "../data/affinity/CASF2013_protein_features.pkl"
+    CSAR2014_data: "../data/pre-training/protein/BS_CSAR2014_labels.tsv"
+    CSAR2014_prot_feats: "../data/affinity/CSAR2014_protein_features.pkl"
+    CSAR2012_data: "../data/pre-training/protein/BS_CSAR2012_labels.tsv"
+    CSAR2012_prot_feats: "../data/affinity/CSAR2012_protein_features.pkl"
+    CSARset1_data: "../data/pre-training/protein/BS_CSARset1_labels.tsv"
+    CSARset1_prot_feats: "../data/affinity/CSARset1_protein_features.pkl"
+    CSARset2_data: "../data/pre-training/protein/BS_CSARset2_labels.tsv"
+    CSARset2_prot_feats: "../data/affinity/CSARset2_protein_features.pkl"
+    Astex_data: "../data/pre-training/protein/BS_Astex_labels.tsv"
+    Astex_prot_feats: "../data/affinity/Astex_protein_features.pkl"
+    COACH420_data: "../data/pre-training/protein/BS_COACH420_labels.tsv"
+    COACH420_prot_feats: "../data/pre-training/protein/COACH420_protein_features.pkl"
+    HOLO4K_data: "../data/pre-training/protein/BS_HOLO4K_labels.tsv"
+    HOLO4K_prot_feats: "../data/pre-training/protein/HOLO4K_protein_features.pkl"
+    
+Train:
+    epochs: 200
+    batch_size: 32
+    dropout: 0.3
+    patience: 20
+    seed: 0
+    device: 0
+    
+Architecture:
+    hidden_size: 256
+    prots_input_dim: 1024
+    num_layer: 3
+    hidden_act: gelu
+    hidden_size: 256
+    intermediate_size: 512
+    num_attention_heads: 8
+    max_lengths: 1500

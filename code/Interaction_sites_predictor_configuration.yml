@@ -1,0 +1,58 @@
+Path:
+    training_data: "../data/pre-training/interaction/interaction_sites_predictor_training_data.tsv"
+    training_protein_feat: "../data/pre-training/protein/pocket_predictor_training_features.pkl"
+    training_ligand_graph: "../data/pre-training/interaction/graph_data.pt"
+    training_interaction: "../data/pre-training/interaction/interaction_sites_labels.pkl"
+    training_pocket_ind: "../results/pre-training/protein/CV1/BS_pocket.pkl"
+    compound_encoder_path: "../checkpoints/pre-training/compound/MGraphPretraingEncoder.pth"
+    save_path: "../checkpoints/pre-training/interaction/"
+    COACH420_data: "../data/pre-training/protein/COACH420_IS_data.tsv"
+    COACH420_protein_feat: "../data/pre-training/protein/COACH420_protein_features.pkl"
+    COACH420_interaction: "../data/pre-training/protein/COACH420_indivisual_nonh_interaction.pkl"
+    COACH420_pocket_ind: "../results/pre-training/protein/CV1/COACH420_pocket.pkl"
+    HOLO4K_data: "../data/pre-training/protein/HOLO4K_IS_data.tsv"
+    HOLO4K_protein_feat: "../data/pre-training/protein/HOLO4K_protein_features.pkl"
+    HOLO4K_interaction: "../data/pre-training/protein/HOLO4K_indivisual_nonh_interaction.pkl"
+    HOLO4K_pocket_ind: "../results/pre-training/protein/CV1/HOLO4K_pocket.pkl"
+    graph_path: "../data/pre-training/protein/graph_data.pt"
+    
+Train:
+    device: 0
+    seed: 0
+    batch_size: 32
+    epochs: 200
+    lr: 0.0001
+    decay: 0.0
+    patience: 20
+
+MGraphModel:
+    Architecture: {"target_dim": 256,
+                   "hidden_dim": 256,
+                   "mid_batch_norm": True,
+                   "last_batch_norm": True,
+                   "readout_batchnorm": True,
+                   "batch_norm_momentum": 0.93,
+                   "readout_hidden_dim": 256,
+                   "readout_layers": 2,
+                   "dropout": 0.0,
+                   "propagation_depth": 3,
+                   "aggregators": ['mean', 'max', 'min', 'std'],
+                   "scalers": ['identity', 'amplification', 'attenuation'],
+                   "readout_aggregators": ['min', 'max', 'mean'],
+                   "pretrans_layers": 2,
+                   "posttrans_layers": 1,
+                   "residual": True}
+                
+CrossAttention:
+    Architecture: {"num_layer": 2,
+                   "hidden_size": 256, 
+                   "intermediate_size": 512,
+                   "num_attention_heads": 4, 
+                   "hidden_act": gelu}
+    Train: {dropout: 0.1}     
+
+InteractionSite:
+    Architecture: {"hidden_size": 256, 
+                   "intermediate_size": 512,
+                   "num_attention_heads": 4, 
+                   "dropout": 0.1}

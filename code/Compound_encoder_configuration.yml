@@ -1,0 +1,46 @@
+MGraphPaths:
+    dataset_path: "../data/pre-training/compound/MgraphDatanonH.pt"
+    save_path: "../checkpoints/pre-training/compound/"
+
+MGraphTrain:
+    device: 0
+    batch_size: 512
+    epochs: 500
+    lr: 0.005
+    decay: 0.0
+    seed: 0
+    num_workers: 8
+    mask_rate1: 0.15
+    mask_rate2: 0.30
+    mask_edge: 1
+    patience: 20
+
+MGraphModel:
+    architecture: {"target_dim": 256,
+                   "hidden_dim": 256,
+                   "mid_batch_norm": True,
+                   "last_batch_norm": True,
+                   "readout_batchnorm": True,
+                   "batch_norm_momentum": 0.93,
+                   "readout_hidden_dim": 256,
+                   "readout_layers": 2,
+                   "dropout": 0.0,
+                   "propagation_depth": 3,
+                   "aggregators": ['mean', 'max', 'min', 'std'],
+                   "scalers": ['identity', 'amplification', 'attenuation'],
+                   "readout_aggregators": ['min', 'max', 'mean'],
+                   "pretrans_layers": 2,
+                   "posttrans_layers": 1,
+                   "residual": True
+                }
+Scheduler:
+    params: {"warmup_steps": [700], 
+            "wrapped_scheduler": 'ReduceLROnPlateau',
+            "cooldown": 20,
+            "factor": 0.6,
+            "patience": 25,
+            "min_lr": 0.000001,
+            "threshold": 0.0001,
+            "mode": 'min',
+            "verbose": True
+        }
