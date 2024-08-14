@@ -56,7 +56,7 @@ def main():
     # 3. CV setting and Train
     ######################### 
     for idx in range(5):
-        reset_seed(0)
+        reset_seed(2024)
         
         BADataset = TrainDataset(interaction_IDs = Interactions_IDs, labels = BA_labels, device = device,
                                         protein_features_path = config["Path"]["training_protein_feat"],
@@ -66,11 +66,7 @@ def main():
                                         
         print(f">>> CV {idx} is running ...")
         train_index, val_index, test_index = Kfold_index_dict[idx]["train"], Kfold_index_dict[idx]["val"], Kfold_index_dict[idx]["test"]
-        
-        np.random.shuffle(train_index)
-        np.random.shuffle(val_index)
-        np.random.shuffle(test_index)                        
-        
+
         ###################################
         # 3.1 Define Binding Affinity model
         ###################################
@@ -78,6 +74,14 @@ def main():
         checkpoint = torch.load(config["Path"]["pretrained_interaction_predictor"])
         state_dict = {k: v for k, v in checkpoint.items() if not k.startswith('ba_predictor')}
         PreTrainedBA_Model.load_state_dict(state_dict, strict=False)
+
+        for parameter in PreTrainedBA_Model.compound_encoder.parameters():
+            parameter.requires_grad = False
+        PreTrainedBA_Model.compound_encoder.eval()
+
+        for parameter in PreTrainedBA_Model.protein_encoder.parameters():
+            parameter.requires_grad = False
+        PreTrainedBA_Model.protein_encoder.eval()
 
         ###################
         # 3.2 Define params
@@ -96,7 +100,12 @@ def main():
         #######################
         # 3.4 Define dataloader 
         #######################
-        BATrainLoader = DataLoader(Subset(BADataset, train_index), batch_size=config['Train']['batch_size'], shuffle=True, collate_fn=pad_data)
+        train_sampler = torch.utils.data.RandomSampler(
+            Subset(BADataset, train_index), 
+            generator=torch.Generator().manual_seed(2024)
+        )
+        
+        BATrainLoader = DataLoader(Subset(BADataset, train_index), batch_size=config['Train']['batch_size'], sampler=train_sampler, collate_fn=pad_data)
         BAValLoader = DataLoader(Subset(BADataset, val_index), batch_size=config['Train']['batch_size'], shuffle=True, collate_fn=pad_data)
         print(f"> Training: {len(train_index)}, Validation: {len(val_index)}, Test: {len(test_index)}")
 
@@ -106,8 +115,7 @@ def main():
         # 3.5 BA Train
         ##############
         for epoch in range(1, config["Train"]["epochs"] + 1):
-            torch.manual_seed(epoch + 1)
-            
+
             TrainLoss = trainer.DTATrain(BATrainLoader)
             print(f"[Train ({epoch})] BA loss: {TrainLoss['DTALoss']:.4f}, PairCE loss: {TrainLoss['InterSitesLoss']:.4f}, PCC: {TrainLoss['PCC']:.4f}")
         
