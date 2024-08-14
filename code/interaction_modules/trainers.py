@@ -151,8 +151,7 @@ class BATrainer():
         self.patience = 0
 
     def DTATrain(self, Loader):        
-        
-        self.model.cross_encoder.train()
+
         self.model.intersites_predictor.train()
         self.model.ba_predictor.train() 
 
@@ -172,7 +171,7 @@ class BATrainer():
             ba_loss = self.dta_criterion(ba_predictions, labels)
             
             self.optimizer.zero_grad()
-            loss = ba_loss + pairwise_loss * 0.8
+            loss = ba_loss + pairwise_loss * 0.1
             loss.backward()
             
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
@@ -211,7 +210,7 @@ class BATrainer():
                 ba_loss = self.dta_criterion(ba_predictions, labels)
                 pairwise_loss = self.pairwise_criterion(pairwise_map_predictions, pocket_interaction_labels, pairwise_mask)
                 
-                loss = ba_loss + pairwise_loss * 0.8
+                loss = ba_loss + pairwise_loss * 0.1
 
                 results['DTALoss'] += float(ba_loss.cpu().item())
                 results['InterSitesLoss'] += float(pairwise_loss.cpu().item())
@@ -224,12 +223,12 @@ class BATrainer():
         results = {k: v / len(Loader) for k, v in results.items()}
         results.update(eval_results)
 
-        if results["DTALoss"] < self.best_eval_loss:
+        if results["PCC"] > self.best_eval_PCC:
             self.patience = 0
             
             torch.save(self.model.state_dict(), f"{self.config['Path']['save_path']}/CV{fold}/PretrainedBA.pth")
-            print(f"Save model improvements: {(self.best_eval_loss - results['DTALoss']):.4f}")
-            self.best_eval_loss = results['DTALoss']
+            print(f"Save model improvements: {(results['PCC'] - self.best_eval_PCC):.4f}")
+            self.best_eval_PCC = results['PCC']
         else:
             self.patience += 1
 

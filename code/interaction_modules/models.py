@@ -85,7 +85,7 @@ class PretrainedBA(nn.Module):
         
         self.config = config
         self.device = device
-        self.dropout_dta = nn.Dropout(0.2)
+        self.dropout_dta = nn.Dropout(0.4)
         
         # Define compound encoder
         self.compound_encoder = PNA(**config["MGraphModel"]["Architecture"]).to(self.device)
@@ -101,7 +101,7 @@ class PretrainedBA(nn.Module):
         
         # Define ba predictor
         self.ba_predictor =  nn.Sequential(
-                        nn.Linear(128, 256),
+                        nn.Linear(640, 256),
                         torch.nn.BatchNorm1d(256),
                         nn.GELU(),
                         self.dropout_dta,
@@ -149,9 +149,11 @@ class PretrainedBA(nn.Module):
         resi_rep, node_rep = self.cross_encoder(resi_rep, pocket_extend_mask, node_rep, compound_extended_attention_mask, pocket_mask, compound_mask) # resi rep: (batch, Max P, 256), node rep: (batch, Max A, 256)
 
         interaction_latent_vectors, pairwise_map_prediction = self.intersites_predictor(resi_rep, pocket_mask, node_rep, compound_mask, pairwise_mask)
-
+        protein_latent_vectors = torch.sum(resi_rep, dim = 1)
+        compound_latent_vectors = torch.sum(node_rep, dim = 1)
+        
         # get ba predictions
-        outputs = self.ba_predictor(interaction_latent_vectors)
+        outputs = self.ba_predictor(torch.concat((protein_latent_vectors, interaction_latent_vectors, compound_latent_vectors), dim =-1))
         return outputs.squeeze(1), pairwise_map_prediction, pairwise_mask
 
     def from_pretrained_model(self, model, model_path):    
@@ -172,9 +174,6 @@ class InteractionSitesModule(nn.Module):
         self.pairwise_compound = nn.Linear(self.config["hidden_size"], 64)
         self.pairwise_protein = nn.Linear(self.config["hidden_size"], 64)
 
-        self.latent_compound = nn.Linear(self.config["hidden_size"], 64)
-        self.latent_protein = nn.Linear(self.config["hidden_size"], 64)  
-        
         self.activation = torch.nn.GELU()
         self.dropout = nn.Dropout(0.1)
     
@@ -188,29 +187,20 @@ class InteractionSitesModule(nn.Module):
         pairwise_protein_features = self.activation(self.pairwise_protein(protein_features))
         pairwise_protein_features = self.dropout(pairwise_protein_features)
         pairwise_protein_features = torch.multiply(pairwise_protein_features, pocket_mask.unsqueeze(2))
-        
-        # get latent features
-        latent_compound_features = self.activation(self.latent_compound(compound_features))
-        latent_compound_features = self.dropout(latent_compound_features)
-        latent_compound_features = torch.multiply(latent_compound_features, compound_mask.unsqueeze(2)) 
 
-        latent_protein_feature = self.activation(self.latent_protein(protein_features))
-        latent_protein_feature = self.dropout(latent_protein_feature)
-        latent_protein_feature = torch.multiply(latent_protein_feature, pocket_mask.unsqueeze(2))
-        
         # get pairwise map predictions
         pairwise_map = torch.matmul(pairwise_compound_features, pairwise_protein_features.transpose(1,2))
 
         # get latent vectors
-        latent_features = torch.cat((latent_compound_features.unsqueeze(2).repeat(1, 1, protein_features.size()[1], 1), latent_protein_feature.unsqueeze(1).repeat(1, compound_features.size()[1], 1, 1)), dim = 3) 
+        latent_features = torch.cat((pairwise_compound_features.unsqueeze(2).repeat(1, 1, protein_features.size()[1], 1), pairwise_protein_features.unsqueeze(1).repeat(1, compound_features.size()[1], 1, 1)), dim = 3) 
+
+        pairwise_map = torch.sigmoid(pairwise_map)
+        pairwise_map = pairwise_map*torch.matmul(compound_mask.unsqueeze(2), pocket_mask.unsqueeze(1)) 
 
         latent_features = torch.multiply(latent_features, pairwise_map.unsqueeze(3))
         latent_features = torch.multiply(latent_features, pairwise_mask.unsqueeze(3)) 
         
         latent_vectors = torch.sum(latent_features.view(latent_features.size()[0], latent_features.size()[1] * latent_features.size()[2], -1), dim = 1)
-
-        pairwise_map = torch.sigmoid(pairwise_map)
-        pairwise_map = pairwise_map*torch.matmul(compound_mask.unsqueeze(2), pocket_mask.unsqueeze(1)) 
 
         return latent_vectors, pairwise_map
 
