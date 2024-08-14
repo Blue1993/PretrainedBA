@@ -93,7 +93,7 @@ def main():
         ########################
         # 3.3 Parms for training 
         ########################       
-        scheduler_dta = CosineAnnealingWarmUpRestarts(optimizer, T_0=15, T_mult=1, eta_maxes=[5e-4, 1e-3], T_up=1, gamma=0.96) 
+        scheduler_dta = CosineAnnealingWarmUpRestarts(optimizer, T_0=15, T_mult=1, eta_maxes=[5e-4, 1e-3], T_up=1, gamma=0.99) 
         print('model trainable params: ', sum(p.numel() for p in PreTrainedBA_Model.parameters() if p.requires_grad))
         print('model Total params: ', sum(p.numel() for p in PreTrainedBA_Model.parameters()))
         
