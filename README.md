@@ -3,6 +3,7 @@
 PretrainedBA is a complex-free binding affinity prediction model. \
 To improve the accuracy of binding affinity prediction, each model that makes up PretrainedBA is pretrained with data from external datasets.
 Due to capacity issues, train and test data is available for download from the following sources: 
+https://www.dropbox.com/scl/fo/6m0dtqsa1kmczonb9o8h6/AKGa28GP_3il5K-9CgDSKeo?rlkey=rp6bfxxaasp8gybrknq660h27&st=79hqzh5d&dl=0
 
 Replace the 'data' dir within the GitHub folder with the downloaded 'data' dir to utilize the provided code for train and test.
 
