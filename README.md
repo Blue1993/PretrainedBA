@@ -8,7 +8,7 @@ https://www.dropbox.com/scl/fo/6m0dtqsa1kmczonb9o8h6/AKGa28GP_3il5K-9CgDSKeo?rlk
 Replace the 'data' dir within the GitHub folder with the downloaded 'data' dir to utilize the provided code for train and test.
 
 
-![KakaoTalk_20240716_222027048](https://github.com/user-attachments/assets/25d75b0d-089e-47c0-9e79-dbdab6674e09)
+![그림19](https://github.com/user-attachments/assets/06e8e561-5d25-4948-8aa6-986c5e0a8ed9)
 
 
 ## Requirements
